@@ -1,0 +1,4 @@
+- [ ] add description
+- [ ] add memory obfuscation
+- [ ] add association-based passwords
+- [ ] TESTS

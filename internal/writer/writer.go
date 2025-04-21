@@ -1,19 +1,19 @@
 package writer
 
 import (
+	"bufio"
 	"fmt"
 	"os"
-	"bufio"
-	"strings"
 	"passkeeper/internal/crypto"
+	"strings"
 )
 
 func getFilePath(service string) string {
 	return fmt.Sprintf("./passwords/%s.txt", service)
 }
 
-func getDecodedFilePath(service string) string {
-	return fmt.Sprintf("./passwords/%s-decode.txt", service)
+func getDecryptedFilePath(service string) string {
+	return fmt.Sprintf("./passwords/%s-decrypt.txt", service)
 }
 
 func InitServiceStorage(service string) error {
@@ -62,10 +62,10 @@ func processLines(filePath string, generatedKey []byte, encrypt bool) ([]string,
 }
 
 func EncryptFile(service string, _ string, key []byte) error {
-	decodedPath := getDecodedFilePath(service)
+	decryptedPath := getDecryptedFilePath(service)
 	encryptedPath := getFilePath(service)
 
-	lines, err := processLines(decodedPath, key, true)
+	lines, err := processLines(decryptedPath, key, true)
 	if err != nil {
 		return fmt.Errorf("error encrypting: %v", err)
 	}
@@ -74,7 +74,7 @@ func EncryptFile(service string, _ string, key []byte) error {
 }
 
 func DecryptFile(service string, _ string, key []byte) error {
-	decodedPath := getDecodedFilePath(service)
+	decryptedPath := getDecryptedFilePath(service)
 	encryptedPath := getFilePath(service)
 
 	lines, err := processLines(encryptedPath, key, false)
@@ -82,7 +82,7 @@ func DecryptFile(service string, _ string, key []byte) error {
 		return fmt.Errorf("error decrypting: %v", err)
 	}
 
-	return os.WriteFile(decodedPath, []byte(strings.Join(lines, "\n")+"\n"), 0644)
+	return os.WriteFile(decryptedPath, []byte(strings.Join(lines, "\n")+"\n"), 0644)
 }
 
 func ShowList(service string) error {
@@ -106,6 +106,7 @@ func ShowList(service string) error {
 
 func ShowValue(key, service, _ string, generatedKey []byte) (string, error) {
 	filePath := getFilePath(service)
+
 	file, err := os.Open(filePath)
 	if err != nil {
 		return "", fmt.Errorf("error opening file: %v", err)
@@ -164,4 +165,3 @@ func RemoveValue(key, service string) error {
 
 	return os.WriteFile(filePath, []byte(strings.Join(lines, "\n")+"\n"), 0644)
 }
-
